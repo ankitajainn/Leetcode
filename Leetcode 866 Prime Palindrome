@@ -1,0 +1,41 @@
+class Solution {
+public:
+    bool isPrime(int num) {
+        if (num <= 1) return false;
+        if (num == 2) return true;
+        if (num % 2 == 0) return false;
+        for (int i = 3; i * i <= num; i += 2) {
+            if (num % i == 0) return false;
+        }
+        return true;
+    }
+
+    int primePalindrome(int n) {
+        if (n <= 2) return 2;
+        if (n <= 3) return 3;
+        if (n <= 5) return 5;
+        if (n <= 7) return 7;
+        if (n <= 11) return 11;
+
+        for (int l = 1; l <= 5; ++l) {
+            // Generate palindromes of length l*2 and l*2-1
+            for (int root = pow(10, l-1); root < pow(10, l); ++root) {
+                // Construct even-length palindrome (e.g., 123 -> 123321)
+                string s = to_string(root);
+                string rev_s = s;
+                reverse(rev_s.begin(), rev_s.end());
+                int even_pal = stoi(s + rev_s);
+                if (even_pal >= n && isPrime(even_pal)) {
+                    return even_pal;
+                }
+                // Construct odd-length palindrome (e.g., 123 -> 12321)
+                string odd_s = s + rev_s.substr(1);
+                int odd_pal = stoi(odd_s);
+                if (odd_pal >= n && isPrime(odd_pal)) {
+                    return odd_pal;
+                }
+            }
+        }
+        return -1; // should not reach here for n <= 1e8
+    }
+};
