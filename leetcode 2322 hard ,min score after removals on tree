@@ -1,0 +1,81 @@
+class Solution {
+public:
+    void dfs(int parent,int node,vector<int>&subtree,vector<int>&intime ,vector<int>&outtime,int &timer,vector<int>& nums,unordered_map<int,vector<int>>&adj){
+
+        subtree[node]=nums[node];
+        intime[node]=timer;//++;
+        timer++;
+        for(int &child:adj[node]){
+            if(child!=parent){
+                dfs(node,child,subtree,intime,outtime,timer,nums,adj);
+                subtree[node] ^= subtree[child];
+            }
+        }
+        outtime[node]=timer;//++;
+        timer++;
+
+
+
+    }
+
+
+    bool isancestor(int u,int v,vector<int>&intime,vector<int>&outtime){
+        return intime[v]>=intime[u] && outtime[v]<=outtime[u];
+            }
+
+
+
+    int minimumScore(vector<int>& nums, vector<vector<int>>& edges) {
+        int n= nums.size();
+
+        unordered_map<int,vector<int>>adj;//adj
+        for( auto & e:edges){
+            int u=e[0];
+            int v=e[1];
+            adj[v].push_back(u);
+            adj[u].push_back(v);
+        }
+
+        vector<int>subtree(n,0);
+        vector<int>intime(n,0);
+        vector<int>outtime(n,0);
+        int timer=0;
+
+        //let rrot be 0
+        dfs(-1,0,subtree,intime,outtime,timer,nums,adj);
+
+        int r=INT_MAX;
+        for(int u=1;u<n;++u){
+            for(int v=u+1;v<n;++v){
+                int x1;
+                int x2;
+                int x3;
+                if(isancestor(u,v,intime,outtime)){
+                    x1=subtree[v];
+                    x2=subtree[v]^subtree[u];
+                    x3=subtree[0]^x1^x2;
+                }
+                else if(isancestor(v,u,intime,outtime)){
+                    x1=subtree[u];
+                    x2=subtree[u]^subtree[v];
+                    x3=subtree[0]^x1^x2;
+
+                }
+                else{
+                    x1=subtree[u];
+                    x2=subtree[v];//^subtree[v];
+                    x3=subtree[0]^x1^x2;
+                }
+                r=min(r,get(x1,x2,x3));
+
+            }
+        }
+        return r;
+
+    }
+    int get(int a,int b,int c){
+        int mn=min({a,b,c});
+        int mx=max({a,b,c});
+        return mx-mn;
+    }
+};
